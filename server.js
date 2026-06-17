@@ -1,12 +1,21 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
+const fs = require("fs");
 require("dotenv").config();
 
 const app = express();
 
+// Ensure uploads directory exists
+const uploadsDir = path.join(__dirname, "uploads");
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
 // ✅ IMPORTANT MIDDLEWARES
 app.use(cors());
 app.use(express.json()); // 🔥 THIS FIXES YOUR ISSUE
+app.use("/uploads", express.static(uploadsDir));
 
 // Routes Auth
 const authRoutes = require("./routes/authRoutes");
@@ -19,6 +28,11 @@ app.use("/api/emp", empRoutes);
 //Routs Students
 const studentRoutes = require("./routes/studentRoutes");
 app.use("/api/student", studentRoutes);
+
+//Routs Students Fees
+const studentFeesRoutes = require("./routes/studentFeesRoutes");
+app.use("/api/studentfees", studentFeesRoutes);
+
 
 //Routs User
 const userRoutes = require("./routes/userRoutes");
@@ -45,6 +59,7 @@ const PORT = process.env.PORT || 5001;
 
 app.listen(PORT, () => {
   console.log("🚀 Server running on port " + PORT);
+  console.log("🔐 Auth: POST /api/auth/register | POST /api/auth/login | GET /api/auth/users | GET /api/auth/profile");
 });
 
 
@@ -83,3 +98,9 @@ db.query("DESCRIBE fees")
 db.query("DESCRIBE transport")
   .then(([result]) => console.log("📊 TABLE STRUCTURE:", result))
   .catch(err => console.log(err));
+
+  //Student Fees table
+db.query("DESCRIBE student_fees")
+  .then(([result]) => console.log("📊 TABLE STRUCTURE:", result))
+  .catch(err => console.log(err));
+

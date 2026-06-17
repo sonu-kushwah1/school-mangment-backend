@@ -9,6 +9,12 @@ exports.register = async (req, res) => {
 
     const { fname, email, phone, role, password } = req.body;
 
+    if (!fname || !email || !phone || !role || !password) {
+      return res.status(400).json({
+        message: "fname, email, phone, role and password are required",
+      });
+    }
+
     // check existing user
     const [existingUser] = await db.query(
       "SELECT * FROM users WHERE email = ?",
@@ -48,6 +54,12 @@ exports.register = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "email and password are required",
+      });
+    }
 
     const [users] = await db.query(
       "SELECT * FROM users WHERE email = ?",
@@ -106,6 +118,25 @@ exports.login = async (req, res) => {
 };
 
 
+
+// GET ALL AUTH USERS (users table — register/login wale)
+exports.getAllUsers = async (req, res) => {
+  try {
+    const [users] = await db.query(
+      "SELECT id, fname, email, phone, role FROM users"
+    );
+
+    res.status(200).json({
+      success: true,
+      count: users.length,
+      data: users,
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+};
 
 // PROFILE
 exports.profile = async (req, res) => {

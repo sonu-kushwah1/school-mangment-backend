@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const controller = require("../controllers/studentsController");
+const upload = require("../middleware/uploadMiddleware");
 
 // GET ALL
 router.get("/", controller.getStudent);
@@ -10,10 +11,10 @@ router.get("/", controller.getStudent);
 router.get("/:id", controller.getStudentById);
 
 // CREATE
-router.post("/", controller.createStudent);
+router.post("/", upload.single("student_img"), controller.createStudent);
 
 // UPDATE
-router.put("/:id", controller.updateStudent);
+router.put("/:id", upload.single("student_img"), controller.updateStudent);
 
 // DELETE
 router.delete("/:id", controller.deleteStudent);

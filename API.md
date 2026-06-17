@@ -91,7 +91,7 @@ Authorization: Bearer <token_from_login>
   "fees": 5000
 }
 ```
-Required: `first_name`, `email`
+Required: None
 
 ---
 
