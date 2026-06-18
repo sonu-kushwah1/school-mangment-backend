@@ -159,3 +159,110 @@ exports.profile = async (req, res) => {
     });
   }
 };
+
+
+// UPDATE PROFILE (Self)
+exports.updateProfile = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { fname, email, phone, password } = req.body;
+
+    // Check if user exists
+    const [users] = await db.query("SELECT * FROM users WHERE id = ?", [userId]);
+    if (users.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const user = users[0];
+
+    // Check email uniqueness if email is changing
+    if (email && email !== user.email) {
+      const [existingUser] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
+      if (existingUser.length > 0) {
+        return res.status(400).json({ message: "Email already in use" });
+      }
+    }
+
+    const updatedFname = fname !== undefined ? fname : user.fname;
+    const updatedEmail = email !== undefined ? email : user.email;
+    const updatedPhone = phone !== undefined ? phone : user.phone;
+    let updatedPassword = user.password;
+
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      updatedPassword = await bcrypt.hash(password, salt);
+    }
+
+    await db.query(
+      "UPDATE users SET fname = ?, email = ?, phone = ?, password = ? WHERE id = ?",
+      [updatedFname, updatedEmail, updatedPhone, updatedPassword, userId]
+    );
+
+    res.status(200).json({
+      message: "Profile updated successfully",
+      user: {
+        id: userId,
+        fname: updatedFname,
+        email: updatedEmail,
+        phone: updatedPhone,
+        role: user.role,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+// UPDATE USER BY ID
+exports.updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { fname, email, phone, role, password } = req.body;
+
+    // Check if user exists
+    const [users] = await db.query("SELECT * FROM users WHERE id = ?", [id]);
+    if (users.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const user = users[0];
+
+    // Check email uniqueness if email is changing
+    if (email && email !== user.email) {
+      const [existingUser] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
+      if (existingUser.length > 0) {
+        return res.status(400).json({ message: "Email already in use" });
+      }
+    }
+
+    const updatedFname = fname !== undefined ? fname : user.fname;
+    const updatedEmail = email !== undefined ? email : user.email;
+    const updatedPhone = phone !== undefined ? phone : user.phone;
+    const updatedRole = role !== undefined ? role : user.role;
+    let updatedPassword = user.password;
+
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      updatedPassword = await bcrypt.hash(password, salt);
+    }
+
+    await db.query(
+      "UPDATE users SET fname = ?, email = ?, phone = ?, role = ?, password = ? WHERE id = ?",
+      [updatedFname, updatedEmail, updatedPhone, updatedRole, updatedPassword, id]
+    );
+
+    res.status(200).json({
+      message: "User updated successfully",
+      user: {
+        id: parseInt(id),
+        fname: updatedFname,
+        email: updatedEmail,
+        phone: updatedPhone,
+        role: updatedRole,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
