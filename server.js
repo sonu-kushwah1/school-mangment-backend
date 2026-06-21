@@ -34,9 +34,7 @@ const studentFeesRoutes = require("./routes/studentFeesRoutes");
 app.use("/api/studentfees", studentFeesRoutes);
 
 
-//Routs User
-const userRoutes = require("./routes/userRoutes");
-app.use("/api/user", userRoutes);
+
 
 //Routs Class
 const classRoutes = require("./routes/classRoutes");
@@ -80,7 +78,7 @@ db.query("DESCRIBE student")
   .catch(err => console.log(err));
 
 //user table
-db.query("DESCRIBE user")
+db.query("DESCRIBE users")
   .then(([result]) => console.log("📊 TABLE STRUCTURE:", result))
   .catch(err => console.log(err));
 
@@ -99,7 +97,7 @@ db.query("DESCRIBE transport")
   .then(([result]) => console.log("📊 TABLE STRUCTURE:", result))
   .catch(err => console.log(err));
 
-  //Student Fees table
+//Student Fees table
 db.query("DESCRIBE student_fees")
   .then(([result]) => console.log("📊 TABLE STRUCTURE:", result))
   .catch(err => console.log(err));

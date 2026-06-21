@@ -52,6 +52,18 @@ Authorization: Bearer <token_from_login>
 ### Profile (protected)
 `GET /api/auth/profile`
 
+### Update Profile (protected)
+`PUT /api/auth/profile`
+
+### Get All Users (protected)
+`GET /api/auth/users`
+
+### Update User by ID (protected)
+`PUT /api/auth/user/:id`
+
+### Delete User by ID (protected)
+`DELETE /api/auth/user/:id`
+
 ---
 
 ## Employees — `/api/emp`

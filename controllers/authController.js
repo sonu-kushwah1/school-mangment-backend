@@ -266,3 +266,25 @@ exports.updateUser = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+
+// DELETE USER BY ID
+exports.deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Check if user exists
+    const [users] = await db.query("SELECT * FROM users WHERE id = ?", [id]);
+    if (users.length === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    await db.query("DELETE FROM users WHERE id = ?", [id]);
+
+    res.status(200).json({
+      message: "User deleted successfully",
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
