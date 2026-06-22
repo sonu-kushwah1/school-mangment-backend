@@ -9,7 +9,7 @@ const storage = multer.diskStorage({
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
     const ext = path.extname(file.originalname);
-    cb(null, `student-${uniqueSuffix}${ext}`);
+    cb(null, `user-${uniqueSuffix}${ext}`);
   },
 });
 
@@ -19,7 +19,7 @@ const fileFilter = (req, file, cb) => {
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error("Invalid file type. Only JPEG, JPG, and PNG are allowed."), false);
+    cb(new Error("Invalid file type. Only JPEG, JPG, PNG and WEBP are allowed."), false);
   }
 };
 

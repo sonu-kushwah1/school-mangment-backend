@@ -77,9 +77,29 @@ db.query("DESCRIBE student")
   .then(([result]) => console.log("📊 TABLE STRUCTURE:", result))
   .catch(err => console.log(err));
 
-//user table
-db.query("DESCRIBE users")
-  .then(([result]) => console.log("📊 TABLE STRUCTURE:", result))
+// Ensure user_profile column exists in users table
+db.query("ALTER TABLE users ADD COLUMN user_profile VARCHAR(255) DEFAULT NULL")
+  .then(() => console.log("✅ Column user_profile verified/added to users table"))
+  .catch(err => {
+    // Ignore duplicate column name error (ER_DUP_FIELDNAME)
+    if (err.errno === 1060 || err.code === 'ER_DUP_FIELDNAME') {
+      console.log("ℹ️ Column user_profile already exists in users table");
+    } else {
+      console.error("❌ Error adding user_profile column:", err.message);
+    }
+  })
+  .then(() => {
+    // Ensure the column explicitly allows NULL (in case it was created as NOT NULL previously)
+    return db.query("ALTER TABLE users MODIFY COLUMN user_profile VARCHAR(255) NULL DEFAULT NULL");
+  })
+  .then(() => console.log("✅ Column user_profile modified to allow NULL values"))
+  .catch(err => console.error("❌ Error modifying user_profile column:", err.message))
+  .then(() => {
+    //user table
+    return db.query("DESCRIBE users");
+  })
+
+  .then(([result]) => console.log("📊 TABLE STRUCTURE (users):", result))
   .catch(err => console.log(err));
 
 //classname table
@@ -101,4 +121,26 @@ db.query("DESCRIBE transport")
 db.query("DESCRIBE student_fees")
   .then(([result]) => console.log("📊 TABLE STRUCTURE:", result))
   .catch(err => console.log(err));
+
+// Initialize default role permissions if empty
+db.query("SELECT COUNT(*) as count FROM role_permissions")
+  .then(([rows]) => {
+    if (rows[0].count === 0) {
+      console.log("ℹ️ role_permissions table is empty. Initializing default permissions...");
+      const defaults = [
+        ["admin", "create"],
+        ["admin", "view"],
+        ["admin", "update"],
+        ["admin", "delete"],
+        ["teacher", "create"],
+        ["teacher", "view"],
+        ["teacher", "update"],
+        ["student", "view"]
+      ];
+      return db.query("INSERT INTO role_permissions (role, permission) VALUES ?", [defaults]);
+    }
+  })
+  .then(() => console.log("✅ Initialized default role_permissions successfully"))
+  .catch(err => console.error("❌ Error initializing role_permissions:", err.message));
+
 
