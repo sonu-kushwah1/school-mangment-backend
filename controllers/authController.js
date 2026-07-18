@@ -105,7 +105,7 @@ exports.login = async (req, res) => {
         email: user.email,
         role: user.role,
       },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || "school_management_secret_key",
       {
         expiresIn: "7d",
       }

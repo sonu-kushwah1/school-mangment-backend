@@ -11,12 +11,15 @@ const protect = (req, res, next) => {
   }
 
   try {
-
-    const token = authHeader.split(" ")[1];
+    // Support both "Bearer <token>" and direct "<token>" formats
+    let token = authHeader;
+    if (authHeader.toLowerCase().startsWith("bearer ")) {
+      token = authHeader.slice(7).trim();
+    }
 
     const decoded = jwt.verify(
       token,
-      process.env.JWT_SECRET
+      process.env.JWT_SECRET || "school_management_secret_key"
     );
 
     req.user = decoded;
